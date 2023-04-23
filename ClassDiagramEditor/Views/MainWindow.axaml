@@ -1,0 +1,82 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ClassDiagramEditor.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:views="clr-namespace:ClassDiagramEditor.Views"
+		xmlns:views_elem="clr-namespace:ClassDiagramEditor.Views.Elements"
+		xmlns:models="clr-namespace:ClassDiagramEditor.Models"
+		xmlns:recelem="clr-namespace:ClassDiagramEditor.Models.RectangleElements"
+		xmlns:conv="clr-namespace:ClassDiagramEditor.Converters"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="ClassDiagramEditor.Views.MainWindow"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="ClassDiagramEditor">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+	
+	<Window.Resources>
+		<conv:StringToPointConverter x:Key="stringToPointConverter"/>
+	</Window.Resources>
+	
+	<DockPanel>
+		<Menu DockPanel.Dock="Top" BorderBrush="Gray" BorderThickness="1">
+			<MenuItem Name="menuExport" Header="Экспортировать">
+				<MenuItem Header="Экспортировать в PNG" Command="{Binding ExportButton}" CommandParameter="png"/>
+				<MenuItem Header="Экспортировать в JSON" Command="{Binding ExportButton}" CommandParameter="json"/>
+				<MenuItem Header="Экспортировать в YAML" Command="{Binding ExportButton}" CommandParameter="yaml"/>
+				<MenuItem Header="Экспортировать в XML" Command="{Binding ExportButton}" CommandParameter="xml"/>
+			</MenuItem>
+			<MenuItem Name="menuImport" Header="Импортировать">
+				<MenuItem Header="Импортировать в JSON" Command="{Binding ImportButton}" CommandParameter="json"/>
+				<MenuItem Header="Импортировать в XML" Command="{Binding ImportButton}" CommandParameter="xml"/>
+				<MenuItem Header="Импортировать в YAML" Command="{Binding ExportButton}" CommandParameter="yaml"/>
+			</MenuItem>
+			<MenuItem Name="addElement" Header="Добавить элемент">
+				<MenuItem Header="Класс" />
+				<MenuItem Header="Интерфейс" />
+			</MenuItem>
+			<MenuItem Name="addConnector" Header="Добавить связь">
+				<MenuItem Header="Наследование" />
+				<MenuItem Header="Реализация" />
+				<MenuItem Header="Зависимость" />
+				<MenuItem Header="Агрегирование" />
+				<MenuItem Header="Композиция" />
+				<MenuItem Header="Ассоциация" />
+			</MenuItem>
+		</Menu>
+		<ItemsControl DragDrop.AllowDrop="True"
+				  Items="{Binding Shapes}"
+				  PointerPressed="OnPointerPressed">
+			<ItemsControl.ItemsPanel>
+				<ItemsPanelTemplate>
+					<Canvas Name="highLevelCanvas"/>
+				</ItemsPanelTemplate>
+			</ItemsControl.ItemsPanel>
+
+			<ItemsControl.DataTemplates>
+				<DataTemplate DataType="{x:Type	recelem:RectangleWithConnectors}">
+					<views_elem:ClassControl DoubleTapped="OpenParameterWindow">
+						<views_elem:ClassControl.RenderTransform>
+							<TranslateTransform X="{Binding StartPoint.X}"
+												Y="{Binding StartPoint.Y}"/>
+						</views_elem:ClassControl.RenderTransform>
+						
+					</views_elem:ClassControl>
+				</DataTemplate>
+
+				<DataTemplate DataType="{x:Type	recelem:Connector}">
+					<Line StartPoint="{Binding StartPoint}"
+						  EndPoint="{Binding EndPoint}"
+						  Stroke="LawnGreen"
+						  StrokeThickness="2"/>
+				</DataTemplate>
+			</ItemsControl.DataTemplates>
+		</ItemsControl>
+	</DockPanel>
+</Window>
+

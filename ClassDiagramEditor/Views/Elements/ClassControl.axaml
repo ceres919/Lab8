@@ -1,0 +1,100 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:ClassDiagramEditor.Views.Elements"
+		xmlns:conv="clr-namespace:ClassDiagramEditor.Converters">
+	
+	<Design.PreviewWith>
+		<controls:ClassControl />
+	</Design.PreviewWith>
+
+	<Styles.Resources>
+		<conv:PointPositionConverter x:Key="pointPositionConverter"/>
+		<conv:ByTypeConverter x:Key="byTypeConverter"/>
+		<conv:SizeConverter x:Key="sizeConverter"/>
+		<conv:ClassNameStyleConverter x:Key="nameStyleConverter"/>
+	</Styles.Resources>
+	
+
+  <Style Selector="controls|ClassControl">
+    <!-- Set Defaults -->
+    <Setter Property="Template">
+      <ControlTemplate>
+		  <Canvas Name="RecClassControl" Height="{Binding Height}" Width="{Binding Width}" Background="Transparent"
+				  MinHeight="150" MinWidth="170">
+			  <Border Height="{Binding Height, Converter={StaticResource sizeConverter}}" Width="{Binding Width, Converter={StaticResource sizeConverter}}" 
+					  BorderBrush="Black" BorderThickness="2" Background="AliceBlue">
+				  <Border.RenderTransform>
+					  <TranslateTransform X="5" Y="5"/>
+				  </Border.RenderTransform>
+				  <ScrollViewer HorizontalScrollBarVisibility="Auto">
+					  <StackPanel>
+						  <TextBlock Text="{Binding Type, Converter={StaticResource byTypeConverter}}" FontWeight="Normal" FontStyle="Italic" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+						  
+						  <Border Name="ClassName" Width="{Binding }" MinHeight="20" BorderBrush="Black" BorderThickness="0 0 0 2">
+							  <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Center"
+										 TextDecorations="{Binding Stereotype, Converter={StaticResource nameStyleConverter}, ConverterParameter='static'}" 
+										 FontStyle="{Binding Stereotype, Converter={StaticResource nameStyleConverter}, ConverterParameter='abstract'}"/>
+						  
+						  </Border>
+						  <ItemsControl Name="ListOfAttributes" Items="{Binding Attributes}" MinHeight="5" BorderBrush="Black" BorderThickness="0 0 0 2">
+							  <ItemsControl.ItemTemplate>
+								  <DataTemplate>
+									  <Border>
+										  <TextBlock Text="{Binding Name}"/>
+									  </Border>
+								  </DataTemplate>
+							  </ItemsControl.ItemTemplate>
+						  </ItemsControl>
+						  <ItemsControl Name="ListOfOperations" Items="{Binding Operations}">
+							  <ItemsControl.ItemTemplate>
+								  <DataTemplate>
+									  <TextBlock Text="{Binding Name}"/>
+								  </DataTemplate>
+							  </ItemsControl.ItemTemplate>
+						  </ItemsControl>
+					  </StackPanel>
+				  </ScrollViewer>
+			  </Border>
+			  <!--<Rectangle Height="100" Width="100" Stroke="Black" StrokeThickness="2">
+				  
+				  <Rectangle.RenderTransform>
+					  <TranslateTransform X="5" Y="5"/>
+				  </Rectangle.RenderTransform>
+			  </Rectangle>-->
+			  
+			  <Rectangle Width="10" Height="10" Fill="Transparent" Stroke="DarkGray" StrokeThickness="2">
+				  <Rectangle.RenderTransform>
+					  <TranslateTransform 
+						  X="0"
+						  Y="{Binding Height, Converter={StaticResource pointPositionConverter}, ConverterParameter='middle'}"/> 
+				  </Rectangle.RenderTransform>
+			  </Rectangle>
+
+			  <Rectangle Width="10" Height="10" Fill="Transparent" Stroke="DarkGray" StrokeThickness="2">
+				  <Rectangle.RenderTransform>
+					  <TranslateTransform 
+						  X="{Binding Width, Converter={StaticResource pointPositionConverter}, ConverterParameter='botton'}" 
+						  Y="{Binding Height, Converter={StaticResource pointPositionConverter}, ConverterParameter='middle'}"/>
+				  </Rectangle.RenderTransform>
+			  </Rectangle>
+
+			  <Rectangle Width="10" Height="10" Fill="Transparent" Stroke="DarkGray" StrokeThickness="2">
+				  <Rectangle.RenderTransform>
+					  <TranslateTransform
+						  X="{Binding Width, Converter={StaticResource pointPositionConverter}, ConverterParameter='middle'}" 
+						  Y="0"/>
+				  </Rectangle.RenderTransform>
+			  </Rectangle>
+
+			  <Rectangle Width="10" Height="10" Fill="Transparent" Stroke="DarkGray" StrokeThickness="2">
+				  <Rectangle.RenderTransform>
+					  <TranslateTransform 
+						  X="{Binding Width, Converter={StaticResource pointPositionConverter}, ConverterParameter='middle'}"
+						  Y="{Binding Height, Converter={StaticResource pointPositionConverter}, ConverterParameter='botton'}"/>
+				  </Rectangle.RenderTransform>
+			  </Rectangle>
+		  </Canvas>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+</Styles>

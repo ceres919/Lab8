@@ -1,0 +1,119 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:vm="using:ClassDiagramEditor.ViewModels"
+		xmlns:models="clr-namespace:ClassDiagramEditor.Models"
+		xmlns:recelem="clr-namespace:ClassDiagramEditor.Models.RectangleElements"
+		xmlns:conv="clr-namespace:ClassDiagramEditor.Converters"
+		Width="600" Height="400"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="400"
+        x:Class="ClassDiagramEditor.Views.ParameterWindow"
+        Title="ParameterWindow">
+
+	<Window.Styles>
+		<Style Selector="TabItem">
+			<Setter Property="FontSize" Value="16"/>
+			<Setter Property="FontWeight" Value="Medium"/>
+			<Setter Property="HorizontalAlignment" Value="Center"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+		</Style>
+		<Style Selector="Button.b2">
+			<Setter Property="HorizontalAlignment" Value="Right"/>
+			<Setter Property="HorizontalContentAlignment" Value="Center"/>
+			<Setter Property="VerticalAlignment" Value="Center"/>
+			<Setter Property="Background" Value="MintCream"/>
+			<Setter Property="FontSize" Value="20"/>
+			<Setter Property="FontWeight" Value="ExtraBold"/>
+		</Style>
+		<Style Selector="TextBox">
+			
+		</Style>
+	</Window.Styles>
+	<TabControl>
+		<TabItem Header="Общие параметры">
+			<Grid ColumnDefinitions="*,*" RowDefinitions="auto,auto,auto">
+					<TextBlock Text="Имя: " Grid.Column="0" Grid.Row="0"/>
+					<TextBox Grid.Column="1" Grid.Row="0" Text="{Binding CurrentName}"/>
+				
+					<TextBlock Text="Cтереотип: " Grid.Column="0" Grid.Row="1"/>
+					<ComboBox Grid.Column="1" Grid.Row="1" SelectedIndex="{Binding CurrentStereotypeIndex}" SelectedItem="{Binding CurrentStereotype}">
+						<ComboBoxItem>Не выбран</ComboBoxItem>
+						<ComboBoxItem>static</ComboBoxItem>
+						<ComboBoxItem>abstract</ComboBoxItem>
+					</ComboBox>
+				
+					<TextBlock Text="Спецификатор видимости: " Grid.Column="0" Grid.Row="2"/>
+					<ComboBox Grid.Column="1" Grid.Row="2" SelectedIndex="{Binding CurrentVisibilitySpecifierIndex}" SelectedItem="{Binding CurrentVisibilitySpecifier}">
+						<ComboBoxItem>public</ComboBoxItem>
+						<ComboBoxItem>internal</ComboBoxItem>
+					</ComboBox>
+			</Grid>
+		</TabItem>
+		<TabItem Header="Атрибуты">
+			<Grid ColumnDefinitions="*,*,*">
+				<ListBox Grid.Column="0" Background="MintCream" BorderBrush="CadetBlue" BorderThickness="1"
+					Items="{Binding ClassAttributes}" SelectedItem="{Binding SelectedAttribute}">
+					<ListBox.ItemTemplate>
+						<DataTemplate>
+							<Grid ColumnDefinitions="*,*">
+								<TextBlock Grid.Column="0" Text="{Binding Name}"/>
+								<Button Classes="b2" Grid.Column="1" Content="-" Background="PaleTurquoise"
+										Command="{Binding DeleteButton}">
+								</Button>
+							</Grid>
+						</DataTemplate>
+					</ListBox.ItemTemplate>
+				</ListBox>
+				<Grid Grid.Column="1" ColumnDefinitions="*,*" RowDefinitions="auto,auto,auto">
+					<TextBlock Text="Имя: " Grid.Column="0" Grid.Row="0"/>
+					<TextBox Grid.Column="1" Grid.Row="0" Text="{Binding AttrName}"/>
+
+					<TextBlock Text="Cтереотип: " Grid.Column="0" Grid.Row="1"/>
+					<StackPanel Orientation="Horizontal">
+						<CheckBox IsChecked="{Binding }" Content="static"/>
+						<CheckBox IsChecked="{Binding }" Content="readolny"/>
+					</StackPanel>
+					<!--<TextBox Grid.Column="1" Grid.Row="1"/>-->
+					
+					<TextBlock Text="Спецификатор видимости: " Grid.Column="0" Grid.Row="2"/>
+					<ComboBox Grid.Column="1" Grid.Row="2" SelectedIndex="{Binding AttrVisibilitySpecifierIndex}" SelectedItem="{Binding AttrVisibilitySpecifier}">
+						<ComboBoxItem>+</ComboBoxItem>
+						<ComboBoxItem>#</ComboBoxItem>
+						<ComboBoxItem>-</ComboBoxItem>
+					</ComboBox>
+				</Grid>
+			</Grid>
+		</TabItem>
+		<TabItem Header="Операции">
+			<Grid ColumnDefinitions="*,*" RowDefinitions="auto,auto,auto">
+				<!--<TextBlock Text="Имя: " Grid.Column="0" Grid.Row="0"/>
+				<TextBox Grid.Column="1" Grid.Row="0"/>
+
+				<TextBlock Text="Cтереотип: " Grid.Column="0" Grid.Row="1"/>
+				<TextBox Grid.Column="1" Grid.Row="1"/>
+				<TextBlock Text="Спецификатор видимости: " Grid.Column="0" Grid.Row="2"/>
+				<TextBox Grid.Column="1" Grid.Row="2"/>
+				<ComboBox SelectedIndex="0" Grid.Column="1" Grid.Row="2">
+					<ComboBoxItem>+</ComboBoxItem>
+					<ComboBoxItem>#</ComboBoxItem>
+					<ComboBoxItem>-</ComboBoxItem>
+				</ComboBox>-->
+			</Grid>
+		</TabItem>
+		<!--<ListBox Name="listBox1" Grid.Column="0" Background="MintCream" BorderBrush="CadetBlue" BorderThickness="1"
+					Items="{Binding ShapeList}" SelectedItem="{Binding SelectedEntity}">
+					<ListBox.ItemTemplate>
+						<DataTemplate>
+							<Grid ColumnDefinitions="*,*">
+								<TextBlock Grid.Column="0" Text="{Binding Name}"/>
+								<Button Name="buttonDeleteShape" Classes="b2" Grid.Column="1" Background="PaleTurquoise"
+										Command="{Binding #mainWindow.DataContext.DeleteButton}" CommandParameter="{Binding }">
+									<Image Classes="h1" Source="/Assets/delete.png"/>
+								</Button>
+							</Grid>
+						</DataTemplate>
+					</ListBox.ItemTemplate>
+				</ListBox>-->
+	</TabControl>
+</Window>
