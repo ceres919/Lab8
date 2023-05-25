@@ -1,4 +1,5 @@
-﻿using Avalonia.Data.Converters;
+﻿using Avalonia.Controls;
+using Avalonia.Data.Converters;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -8,28 +9,25 @@ using System.Threading.Tasks;
 
 namespace ClassDiagramEditor.Converters
 {
-    public class ByTypeConverter : IValueConverter
+    public class StereotypeIndexConverter : IValueConverter
     {
         public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
-            if (value is string str_type && targetType.IsAssignableTo(typeof(string)) == true)
-            {
-                if (str_type == "interface") 
-                {
-                    return "«Interface»";
-                }
-                else
-                {
-                    return "";
-                }
-            }
             return null;
         }
 
         public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            string par = (string)parameter;
+
+            if (value is ComboBoxItem item && par == "value")
+            {
+                if (item != null)
+                {
+                    return item.Content.ToString();
+                }
+            }
+            return null;
         }
     }
 }
- 

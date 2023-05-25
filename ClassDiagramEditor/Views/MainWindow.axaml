@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:views="clr-namespace:ClassDiagramEditor.Views"
 		xmlns:views_elem="clr-namespace:ClassDiagramEditor.Views.Elements"
+		xmlns:recelem_connection="clr-namespace:ClassDiagramEditor.Models.RectangleElements.Connections"
 		xmlns:models="clr-namespace:ClassDiagramEditor.Models"
 		xmlns:recelem="clr-namespace:ClassDiagramEditor.Models.RectangleElements"
 		xmlns:conv="clr-namespace:ClassDiagramEditor.Converters"
@@ -14,8 +15,6 @@
         Title="ClassDiagramEditor">
 
     <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 	
@@ -34,19 +33,19 @@
 			<MenuItem Name="menuImport" Header="Импортировать">
 				<MenuItem Header="Импортировать в JSON" Command="{Binding ImportButton}" CommandParameter="json"/>
 				<MenuItem Header="Импортировать в XML" Command="{Binding ImportButton}" CommandParameter="xml"/>
-				<MenuItem Header="Импортировать в YAML" Command="{Binding ExportButton}" CommandParameter="yaml"/>
+				<MenuItem Header="Импортировать в YAML" Command="{Binding ImportButton}" CommandParameter="yaml"/>
 			</MenuItem>
-			<MenuItem Name="addElement" Header="Добавить элемент">
-				<MenuItem Header="Класс" />
-				<MenuItem Header="Интерфейс" />
+			<MenuItem Name="addElement" Header="Диаграмма">
+				<MenuItem Header="Класс" Command="{Binding AddNewClass}" CommandParameter="class"/>
+				<MenuItem Header="Интерфейс" Command="{Binding AddNewClass}" CommandParameter="interface"/>
 			</MenuItem>
-			<MenuItem Name="addConnector" Header="Добавить связь">
-				<MenuItem Header="Наследование" />
-				<MenuItem Header="Реализация" />
-				<MenuItem Header="Зависимость" />
-				<MenuItem Header="Агрегирование" />
-				<MenuItem Header="Композиция" />
-				<MenuItem Header="Ассоциация" />
+			<MenuItem Name="addConnector" Header="Выбрать текущую связь">
+				<MenuItem Header="Наследование" Command="{Binding CurrentConnection}" CommandParameter="inheritance"/>
+				<MenuItem Header="Реализация" Command="{Binding CurrentConnection}" CommandParameter="realization"/>
+				<MenuItem Header="Зависимость" Command="{Binding CurrentConnection}" CommandParameter="dependency"/>
+				<MenuItem Header="Агрегирование" Command="{Binding CurrentConnection}" CommandParameter="aggregation"/>
+				<MenuItem Header="Композиция" Command="{Binding CurrentConnection}" CommandParameter="composition"/>
+				<MenuItem Header="Ассоциация" Command="{Binding CurrentConnection}" CommandParameter="association"/>
 			</MenuItem>
 		</Menu>
 		<ItemsControl DragDrop.AllowDrop="True"
@@ -54,7 +53,7 @@
 				  PointerPressed="OnPointerPressed">
 			<ItemsControl.ItemsPanel>
 				<ItemsPanelTemplate>
-					<Canvas Name="highLevelCanvas"/>
+					<Canvas Name="highLevelCanvas" ClipToBounds="True" DragDrop.AllowDrop="True" Background="White"/>
 				</ItemsPanelTemplate>
 			</ItemsControl.ItemsPanel>
 
@@ -70,10 +69,19 @@
 				</DataTemplate>
 
 				<DataTemplate DataType="{x:Type	recelem:Connector}">
-					<Line StartPoint="{Binding StartPoint}"
-						  EndPoint="{Binding EndPoint}"
-						  Stroke="LawnGreen"
-						  StrokeThickness="2"/>
+					<Path Data="{Binding GeometryPoints}" Fill="{Binding FillColor}"
+							  Stroke="MediumPurple"
+							  StrokeThickness="4"
+						  DoubleTapped="DeleteConnection">
+						<Path.RenderTransform>
+							<TransformGroup>
+								<RotateTransform
+									Angle="{Binding RotationAngle}"
+									CenterX="{Binding RotationX}"
+									CenterY="{Binding RotationY}"/>
+							</TransformGroup>
+						</Path.RenderTransform>
+					</Path>
 				</DataTemplate>
 			</ItemsControl.DataTemplates>
 		</ItemsControl>

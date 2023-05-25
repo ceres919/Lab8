@@ -15,12 +15,12 @@ namespace ClassDiagramEditor.Converters
             string par = (string)parameter;
             if (value is double mid && targetType.IsAssignableTo(typeof(double)) == true && par == "middle")
             {
-                var x = (mid - 10) / 2;
+                var x = (mid - 14) / 2;
                 return x;
             }
             if (value is double bot && targetType.IsAssignableTo(typeof(double)) == true && par == "botton")
             {
-                var x = bot - 10;
+                var x = bot - 14;
                 return x;
             }
             return null;

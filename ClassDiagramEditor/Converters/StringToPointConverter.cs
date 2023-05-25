@@ -9,14 +9,6 @@ namespace ClassDiagramEditor.Converters
     {
         public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
-            //if (value == "" || value == null) return null;
-            //if (value is string str_point && targetType.IsAssignableTo(typeof(Point)) == true)
-            //{
-            //    var point = str_point.Split(',');
-            //    var x = double.Parse(point[0], CultureInfo.InvariantCulture.NumberFormat);
-            //    var y = double.Parse(point[1], CultureInfo.InvariantCulture.NumberFormat);
-            //    return new Point(x, y);
-            //}
             string par = (string)parameter;
             if (value is string str_pointX && targetType.IsAssignableTo(typeof(double)) == true && par == "x")
             {

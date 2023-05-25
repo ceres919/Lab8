@@ -7,6 +7,9 @@ using Avalonia.VisualTree;
 using ClassDiagramEditor.Models.LoadAndSave;
 using ClassDiagramEditor.Models.RectangleElements;
 using ClassDiagramEditor.ViewModels;
+using DynamicData;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 
@@ -16,13 +19,15 @@ namespace ClassDiagramEditor.Views
     {
         private Point pointPointerPressed;
         private Point pointerPositionIntoShape;
-        private RectangleWithConnectors? secondRectangle;
+        private RectangleWithConnectors? firstRectangle;
         protected bool isDragging;
+        private string connectionParameter;
         private Canvas canv;
+        private double currentRectangleWidth, currentRectangleHeight;
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = new MainWindowViewModel()
+            DataContext = new MainWindowViewModel(this)
             {
                 SaverLoaderFactoryCollection = new ISaverLoaderFactory[]
                     {
@@ -31,16 +36,74 @@ namespace ClassDiagramEditor.Views
                         new YAMLSaverLoaderFactory(),
                     },
             };
+            AddHandler(DragDrop.DragEnterEvent, CanvasDragEnter);
+            AddHandler(DragDrop.DropEvent, CanvasDrop);
+            ConnectionParameter = "inheritance";
         }
-
-        public async void OpenParameterWindow(object sender, RoutedEventArgs routedEventArgs)
+        public string ConnectionParameter 
+        {
+            get => connectionParameter; 
+            set => connectionParameter = value;
+        }
+        private void DeleteConnection(object sender, RoutedEventArgs routedEventArgs)
+        {
+            if (routedEventArgs.Source is Control control)
+            {
+                if (control.DataContext is Connector connector) 
+                {
+                    if (DataContext is MainWindowViewModel dataContext)
+                    {
+                        dataContext.Shapes.Remove(connector);
+                    }
+                }
+            }     
+        }
+        private void CanvasDragEnter(object sender, DragEventArgs dragEventArgs)
+        {
+            dragEventArgs.DragEffects = DragDropEffects.Copy;
+        }
+        public void CanvasDrop(object sender, DragEventArgs dragEventArgs)
+        {
+            List<string> path = (List<string>)dragEventArgs.Data.Get(DataFormats.FileNames);
+            if (DataContext is MainWindowViewModel dataContext)
+            {
+                if (path != null)
+                {
+                    dataContext.LoadDiagram(path.ElementAt(0));
+                }
+            }
+        }
+        private async void OpenParameterWindow(object sender, RoutedEventArgs routedEventArgs)
         {
             if (routedEventArgs.Source is Control control)
             {
                 if (control.DataContext is RectangleWithConnectors rectangle)
                 {
                     ParameterWindow parameterWindow = new ParameterWindow(rectangle);
-                    await parameterWindow.ShowDialog(this);
+
+                    var result = await parameterWindow.ShowDialog<string>(this);
+                    if (this.DataContext is MainWindowViewModel viewModel)
+                    {
+                        viewModel.Shapes.Remove(rectangle);
+                        if (parameterWindow.DataContext is ParameterWindowViewModel parameterVM)
+                        {
+                            switch (result)
+                            {
+                                case "undo-changes":
+                                    viewModel.Shapes.Add(parameterVM.tempClassRectangle);
+                                    break;
+                                case "save-changes":
+                                    viewModel.Shapes.Add(parameterVM.SendClassRectangle);
+                                    break;
+                                case "delete-class":
+                                    break;
+                                default:
+                                    viewModel.Shapes.Add(parameterVM.tempClassRectangle);
+                                    break;
+
+                            }
+                        } 
+                    }
                 }
             }
         }
@@ -57,7 +120,7 @@ namespace ClassDiagramEditor.Views
                         .FirstOrDefault(canvas => string.IsNullOrEmpty(canvas.Name) == false &&
                         canvas.Name.Equals("highLevelCanvas")));
 
-                    if (pointerPressedEventArgs.Source is not Rectangle)
+                    if (pointerPressedEventArgs.Source is not Rectangle && pointerPressedEventArgs.Source is not Ellipse)
                     {
                         pointerPositionIntoShape = pointerPressedEventArgs.GetPosition(control);
                         isDragging = true;
@@ -66,23 +129,74 @@ namespace ClassDiagramEditor.Views
                     }
                     else
                     {
-                        if (this.DataContext is MainWindowViewModel viewModel)
+                        if(pointerPressedEventArgs.Source is Ellipse)
                         {
-                            viewModel.Shapes.Add(new Connector
-                            {
-                                StartPoint = pointPointerPressed,
-                                EndPoint = pointPointerPressed,
-                                Name = "Connector",
-                                FirstRectangle = rectangle,
-                            });
-
-
-                            this.PointerMoved += PointerMoveDrawLine;
-                            this.PointerReleased += PointerPressedReleasedDrawLine;
+                            currentRectangleWidth = rectangle.Width;
+                            currentRectangleHeight = rectangle.Height;
+                            this.PointerMoved += PointerResizeShape;
+                            this.PointerReleased += PointerPressedReleasedResizeShape;
                         }
+                        else
+                        {
+                            if (this.DataContext is MainWindowViewModel viewModel)
+                            {
+                                string fill;
+                                if (connectionParameter == "association" || connectionParameter == "dependency")
+                                {
+                                    fill = "Transperent";
+                                }
+                                else
+                                {
+                                    if (connectionParameter == "composition")
+                                    {
+                                        fill = "MediumPurple";
+                                    }
+                                    else
+                                    {
+                                        fill = "White";
+                                    }
+                                }
+                                viewModel.Shapes.Add(new Connector
+                                {
+                                    StartPoint = pointPointerPressed,
+                                    EndPoint = pointPointerPressed,
+                                    Name = connectionParameter,
+                                    FillColor = fill,
+                                    FirstRectangle = rectangle,
+                                });
+                                firstRectangle = rectangle;
+
+                                this.PointerMoved += PointerMoveDrawLine;
+                                this.PointerReleased += PointerPressedReleasedDrawLine;
+                            }
+                        }
+                        
                     }
                 }
             }
+        }
+        private void PointerResizeShape(object? sender, PointerEventArgs pointerEventArgs)
+        {
+            if (pointerEventArgs.Source is Control control)
+            {
+                if (control.DataContext is RectangleWithConnectors rectangle)
+                {
+                    Point currentPointerPosition = pointerEventArgs
+                    .GetPosition(
+                    this.GetVisualDescendants()
+                    .OfType<Canvas>()
+                    .FirstOrDefault());
+
+                    rectangle.Width = currentRectangleWidth + (currentPointerPosition.X - pointPointerPressed.X);
+                    rectangle.Height = currentRectangleHeight + (currentPointerPosition.Y - pointPointerPressed.Y);
+                }
+            }
+        }
+        private void PointerPressedReleasedResizeShape(object? sender,
+            PointerReleasedEventArgs pointerReleasedEventArgs)
+        {
+            this.PointerMoved -= PointerResizeShape;
+            this.PointerReleased -= PointerPressedReleasedResizeShape;
         }
 
         private void PointerMoveDragShape(object? sender, PointerEventArgs pointerEventArgs)
@@ -148,7 +262,7 @@ namespace ClassDiagramEditor.Views
 
             if (element is Rectangle Rectangle)
             {
-                if (Rectangle.DataContext is RectangleWithConnectors rectangle)
+                if (Rectangle.DataContext is RectangleWithConnectors rectangle && rectangle != firstRectangle)
                 {
                     Connector connector = viewModel.Shapes[viewModel.Shapes.Count - 1] as Connector;
                     connector.SecondRectangle = rectangle;
@@ -193,7 +307,7 @@ namespace ClassDiagramEditor.Views
             {
                 if (result != null)
                 {
-                    //dataContext.LoadDiagram(result[0]);
+                    dataContext.LoadDiagram(result[0]);
                 }
             }
         }
@@ -244,7 +358,7 @@ namespace ClassDiagramEditor.Views
                 if (result != null)
                 {
                     canv = this.GetVisualDescendants().OfType<Canvas>().FirstOrDefault();
-                    //dataContext.SaveDiagram(result, parametr, canv);
+                    dataContext.SaveDiagram(result, parametr, canv);
                 }
             }
         }

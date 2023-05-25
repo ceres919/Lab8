@@ -14,7 +14,7 @@ namespace ClassDiagramEditor.Converters
         {
             if (value is double size && targetType.IsAssignableTo(typeof(double)) == true)
             {
-                var x = size - 10;
+                var x = size - 14;
                 return x;
             }
             return null;

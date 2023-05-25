@@ -1,10 +1,15 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
+using Avalonia.Interactivity;
 using ClassDiagramEditor.Models.LoadAndSave;
 using ClassDiagramEditor.Models.RectangleElements;
+using ClassDiagramEditor.Views;
 using ReactiveUI;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive;
 
 namespace ClassDiagramEditor.ViewModels
 {
@@ -12,72 +17,50 @@ namespace ClassDiagramEditor.ViewModels
     {
         public IEnumerable<ISaverLoaderFactory> SaverLoaderFactoryCollection { get; set; }
         private ObservableCollection<IShape> shapes;
+        public MainWindow mainWindow;
 
-        public MainWindowViewModel()
+        public MainWindowViewModel(Window main)
         {
+            mainWindow = (MainWindow)main;
             Shapes = new ObservableCollection<IShape>();
-            Shapes.Add(new RectangleWithConnectors
-            {
-                Height = 170,
-                Width = 200,
-                Name = "First",
-                Type = "interface",
-                Stereotype = "static",
-                VisibilitySpecifier = "public",
-                StartPoint = new Avalonia.Point(100, 100),
-                Attributes = new() 
-                { 
-                    new AttributeElement(){Name="atr1"}
-                },
-                Operations = new() 
-                { 
-                    new OperationElement(){Name="opr1"}
-                },
-            });
 
-            Shapes.Add(new RectangleWithConnectors
+            ImportButton = ReactiveCommand.Create<string>(param =>
             {
-                Height = 170,
-                Width = 200,
-                Name = "Second",
-                Type = "class",
-                Stereotype = "abstract",
-                StartPoint = new Avalonia.Point(500, 100),
+                mainWindow.OpenFileDialogMenu(param);
             });
-
-            Shapes.Add(new RectangleWithConnectors
+            ExportButton = ReactiveCommand.Create<string>(param =>
             {
-                Height = 170,
-                Width = 200,
-                Name = "First",
-                Type = "interface",
-                StartPoint = new Avalonia.Point(100, 500),
+                mainWindow.SaveFileDialogMenu(param);
             });
-
-            Shapes.Add(new RectangleWithConnectors
+            CurrentConnection = ReactiveCommand.Create<string>(param =>
             {
-                Height = 170,
-                Width = 200,
-                Name = "Second",
-                Type = "class",
-                StartPoint = new Avalonia.Point(500, 500),
+                mainWindow.ConnectionParameter = param;
             });
+        }
+        public void AddNewClass(string parameter)
+        {
+            Shapes.Add(new RectangleWithConnectors()
+                {
+                    Height = 170,
+                    Width = 200,
+                    Name = "NewCLass",
+                    Type = parameter,
+                    StartPoint = new Point(10, 10),
+                    Attributes = new ObservableCollection<AttributeElement>(),
+                    Operations = new ObservableCollection<OperationElement>(),
+                });
         }
         public void LoadDiagram(string path)
         {
-            //list.shapeList.Clear();
-
+            Shapes.Clear();
             var shapeLoader = SaverLoaderFactoryCollection
                 .FirstOrDefault(factory => factory.IsMatch(path) == true)?
                 .CreateLoader();
 
             if (shapeLoader != null)
             {
-                var newList = new ObservableCollection<RectangleWithConnectors>(shapeLoader.Load(path));
-                //foreach (var shape in newList)
-                //{
-                //    ShapeCreator.Load(shape, list);
-                //}
+                var newList = new ObservableCollection<IShape>(shapeLoader.Load(path));
+                Shapes = newList;
             }
         }
         public void SaveDiagram(string path, string parametr, Canvas canvas)
@@ -90,7 +73,7 @@ namespace ClassDiagramEditor.ViewModels
 
                 if (shapeSaver != null)
                 {
-                   // shapeSaver.Save(ShapeList, path);
+                     shapeSaver.Save(Shapes, path);
                 }
             }
             else
@@ -104,5 +87,8 @@ namespace ClassDiagramEditor.ViewModels
             get => shapes;
             set => this.RaiseAndSetIfChanged(ref shapes, value);
         }
+        public ReactiveCommand<string, Unit> ImportButton { get; }
+        public ReactiveCommand<string, Unit> ExportButton { get; }
+        public ReactiveCommand<string, Unit> CurrentConnection { get; }
     }
 }

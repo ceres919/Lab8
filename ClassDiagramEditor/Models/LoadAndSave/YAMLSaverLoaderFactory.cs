@@ -11,12 +11,12 @@ namespace ClassDiagramEditor.Models.LoadAndSave
     {
         public IShapeEntityLoader CreateLoader()
         {
-            return new JSONLoader();
+            return new YAMLLoader();
         }
 
         public IShapeEntitySaver CreateSaver()
         {
-            return new JSONSaver();
+            return new YAMLSaver();
         }
 
         public bool IsMatch(string path)

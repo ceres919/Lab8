@@ -12,35 +12,35 @@
 		<conv:ByTypeConverter x:Key="byTypeConverter"/>
 		<conv:SizeConverter x:Key="sizeConverter"/>
 		<conv:ClassNameStyleConverter x:Key="nameStyleConverter"/>
+		<conv:ParameterToOverallStringConverter x:Key="overallString"/>
 	</Styles.Resources>
 	
 
   <Style Selector="controls|ClassControl">
-    <!-- Set Defaults -->
     <Setter Property="Template">
       <ControlTemplate>
-		  <Canvas Name="RecClassControl" Height="{Binding Height}" Width="{Binding Width}" Background="Transparent"
-				  MinHeight="150" MinWidth="170">
-			  <Border Height="{Binding Height, Converter={StaticResource sizeConverter}}" Width="{Binding Width, Converter={StaticResource sizeConverter}}" 
+		  <Canvas Name="RecClassControl" Width="{Binding Width}" Height="{Binding Height}" Background="Transparent">
+			  <Border Name="mainBoreder" Height="{Binding Height, Converter={StaticResource sizeConverter}}" Width="{Binding Width, Converter={StaticResource sizeConverter}}" 
 					  BorderBrush="Black" BorderThickness="2" Background="AliceBlue">
 				  <Border.RenderTransform>
-					  <TranslateTransform X="5" Y="5"/>
+					  <TranslateTransform X="7" Y="7"/>
 				  </Border.RenderTransform>
-				  <ScrollViewer HorizontalScrollBarVisibility="Auto">
 					  <StackPanel>
-						  <TextBlock Text="{Binding Type, Converter={StaticResource byTypeConverter}}" FontWeight="Normal" FontStyle="Italic" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+						  <TextBlock Text="{Binding Type, Converter={StaticResource byTypeConverter}}" FontWeight="Normal" FontStyle="Italic" FontSize="15" 
+									 VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="{Binding #mainBoreder.Width}"/>
 						  
 						  <Border Name="ClassName" Width="{Binding }" MinHeight="20" BorderBrush="Black" BorderThickness="0 0 0 2">
-							  <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Center"
+							  <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="15" TextWrapping="WrapWithOverflow" TextTrimming="CharacterEllipsis" 
+										 VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="{Binding #mainBoreder.Width}"
 										 TextDecorations="{Binding Stereotype, Converter={StaticResource nameStyleConverter}, ConverterParameter='static'}" 
 										 FontStyle="{Binding Stereotype, Converter={StaticResource nameStyleConverter}, ConverterParameter='abstract'}"/>
-						  
 						  </Border>
 						  <ItemsControl Name="ListOfAttributes" Items="{Binding Attributes}" MinHeight="5" BorderBrush="Black" BorderThickness="0 0 0 2">
 							  <ItemsControl.ItemTemplate>
 								  <DataTemplate>
 									  <Border>
-										  <TextBlock Text="{Binding Name}"/>
+										  <TextBlock Text="{Binding , Converter={StaticResource overallString}, ConverterParameter='attribute'}" TextWrapping="WrapWithOverflow" TextTrimming="CharacterEllipsis"
+													 TextDecorations="{Binding , Converter={StaticResource nameStyleConverter}, ConverterParameter='static'}"/>
 									  </Border>
 								  </DataTemplate>
 							  </ItemsControl.ItemTemplate>
@@ -48,21 +48,17 @@
 						  <ItemsControl Name="ListOfOperations" Items="{Binding Operations}">
 							  <ItemsControl.ItemTemplate>
 								  <DataTemplate>
-									  <TextBlock Text="{Binding Name}"/>
+									  <TextBlock Text="{Binding , Converter={StaticResource overallString}, ConverterParameter='operation'}" 
+												 TextWrapping="WrapWithOverflow" TextTrimming="CharacterEllipsis" MaxWidth="{Binding #mainBoreder.Width}"
+												 TextDecorations="{Binding , Converter={StaticResource nameStyleConverter}, ConverterParameter='static'}"
+												 FontStyle="{Binding , Converter={StaticResource nameStyleConverter}, ConverterParameter='abstract'}"/>
 								  </DataTemplate>
 							  </ItemsControl.ItemTemplate>
 						  </ItemsControl>
 					  </StackPanel>
-				  </ScrollViewer>
 			  </Border>
-			  <!--<Rectangle Height="100" Width="100" Stroke="Black" StrokeThickness="2">
-				  
-				  <Rectangle.RenderTransform>
-					  <TranslateTransform X="5" Y="5"/>
-				  </Rectangle.RenderTransform>
-			  </Rectangle>-->
 			  
-			  <Rectangle Width="10" Height="10" Fill="Transparent" Stroke="DarkGray" StrokeThickness="2">
+			  <Rectangle Width="14" Height="14" Fill="Transparent" Stroke="DarkGray" StrokeThickness="2">
 				  <Rectangle.RenderTransform>
 					  <TranslateTransform 
 						  X="0"
@@ -70,7 +66,7 @@
 				  </Rectangle.RenderTransform>
 			  </Rectangle>
 
-			  <Rectangle Width="10" Height="10" Fill="Transparent" Stroke="DarkGray" StrokeThickness="2">
+			  <Rectangle Width="14" Height="14" Fill="Transparent" Stroke="DarkGray" StrokeThickness="2">
 				  <Rectangle.RenderTransform>
 					  <TranslateTransform 
 						  X="{Binding Width, Converter={StaticResource pointPositionConverter}, ConverterParameter='botton'}" 
@@ -78,7 +74,7 @@
 				  </Rectangle.RenderTransform>
 			  </Rectangle>
 
-			  <Rectangle Width="10" Height="10" Fill="Transparent" Stroke="DarkGray" StrokeThickness="2">
+			  <Rectangle Width="14" Height="14" Fill="Transparent" Stroke="DarkGray" StrokeThickness="2">
 				  <Rectangle.RenderTransform>
 					  <TranslateTransform
 						  X="{Binding Width, Converter={StaticResource pointPositionConverter}, ConverterParameter='middle'}" 
@@ -86,13 +82,20 @@
 				  </Rectangle.RenderTransform>
 			  </Rectangle>
 
-			  <Rectangle Width="10" Height="10" Fill="Transparent" Stroke="DarkGray" StrokeThickness="2">
+			  <Rectangle Width="14" Height="14" Fill="Transparent" Stroke="DarkGray" StrokeThickness="2">
 				  <Rectangle.RenderTransform>
 					  <TranslateTransform 
 						  X="{Binding Width, Converter={StaticResource pointPositionConverter}, ConverterParameter='middle'}"
 						  Y="{Binding Height, Converter={StaticResource pointPositionConverter}, ConverterParameter='botton'}"/>
 				  </Rectangle.RenderTransform>
 			  </Rectangle>
+			  <Ellipse Width="10" Height="10" Fill="AliceBlue" Stroke="Aqua" StrokeThickness="2">
+				  <Ellipse.RenderTransform>
+					  <TranslateTransform
+						  X="{Binding Width, Converter={StaticResource pointPositionConverter}, ConverterParameter='botton'}"
+						  Y="{Binding Height, Converter={StaticResource pointPositionConverter}, ConverterParameter='botton'}"/>
+				  </Ellipse.RenderTransform>
+			  </Ellipse>
 		  </Canvas>
       </ControlTemplate>
     </Setter>

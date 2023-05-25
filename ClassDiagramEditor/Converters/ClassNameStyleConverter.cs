@@ -1,5 +1,6 @@
 ﻿using Avalonia.Data.Converters;
 using Avalonia.Media;
+using ClassDiagramEditor.Models.RectangleElements;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -14,16 +15,25 @@ namespace ClassDiagramEditor.Converters
         public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             string par = (string)parameter;
-            if (value is string stereotype1 && targetType.IsAssignableTo(typeof(TextDecorationCollection)) == true && par == "static")
+            if (targetType.IsAssignableTo(typeof(TextDecorationCollection)) == true && par == "static")
             {
                 TextDecorationCollection style = TextDecorations.Underline;
-                if (stereotype1 == "static") return style;
+                if(value is string stereotype1 && stereotype1 == "static")
+                    return style;
+                if(value is AttributeElement attr && attr.IsStatic == true)
+                    return style;
+                if (value is OperationElement oper && oper.IsStatic == true)
+                    return style;
             }
-            if (value is string stereotype2 && targetType.IsAssignableTo(typeof(FontStyle)) == true && par == "abstract")
+            if (targetType.IsAssignableTo(typeof(FontStyle)) == true && par == "abstract")
             {
                 FontStyle style = FontStyle.Italic;
-                if (stereotype2 == "abstract") return style;
+                if (value is string stereotype2 && stereotype2 == "abstract") 
+                    return style;
+                if (value is OperationElement oper && oper.IsAbstract == true)
+                    return style;
             }
+
             return null;
         }
 

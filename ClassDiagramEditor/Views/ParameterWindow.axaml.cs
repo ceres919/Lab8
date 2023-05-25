@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using ClassDiagramEditor.Models.RectangleElements;
 using ClassDiagramEditor.ViewModels;
 using System.Collections.Generic;
@@ -20,5 +21,18 @@ namespace ClassDiagramEditor.Views
             InitializeComponent();
             DataContext = new ParameterWindowViewModel(sender);
         }
+        private void DeleteClassButton(object sender, RoutedEventArgs routedEventArgs)
+        {
+            Close("delete-class");
+        }
+        private void UndoChangesClassButton(object sender, RoutedEventArgs routedEventArgs)
+        {
+            Close("undo-changes");
+        }
+        private void SaveChangesClassButton(object sender, RoutedEventArgs routedEventArgs)
+        {
+            Close("save-changes");
+        }
+
     }
 }

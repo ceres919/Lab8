@@ -5,6 +5,6 @@ namespace ClassDiagramEditor.Models.LoadAndSave
 {
     public interface IShapeEntitySaver
     {
-        void Save(ObservableCollection<RectangleWithConnectors> people, string path);
+        void Save(ObservableCollection<IShape> people, string path);
     }
 }
